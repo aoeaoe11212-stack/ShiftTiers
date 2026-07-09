@@ -1,102 +1,136 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* Main system overrides */
+/* Core Space Void Setup */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #030712; /* Deep modern space black */
-    color: #f3f4f6;
-    letter-spacing: -0.01em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #0b0d13;
+    background-image: 
+        radial-gradient(circle at 0% 0%, rgba(0, 255, 102, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(0, 153, 255, 0.03) 0%, transparent 40%);
+    background-attachment: fixed;
+    color: #e2e8f0;
+    overflow-x: hidden;
 }
 
-/* Code components get the sleek monospace look */
-code, pre, select, input, .monospace-terminal {
-    font-family: 'Fira Code', monospace !important;
+/* Monospace fonts for Tiers, Inputs, Tables */
+code, pre, select, input, th, .tier-badge {
+    font-family: 'JetBrains Mono', monospace !important;
 }
 
-/* Premium Thin Custom Scrollbars */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-::-webkit-scrollbar-track {
-    background: #030712;
-}
-::-webkit-scrollbar-thumb {
-    background: #1f2937;
-    border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #00ff66;
+/* Glassmorphism Containers */
+.crypto-card, 
+fieldset, 
+form,
+.bg-gray-900, 
+.bg-[#111622] {
+    background: rgba(15, 18, 28, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Sharp, Minimalist Tier Badges */
+/* Matte Flat Table Structure */
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 6px !important; /* Creates detached floating rows */
+}
+
+thead th {
+    background: transparent !important;
+    color: #64748b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-bottom: 12px !important;
+    border: none !important;
+}
+
+tbody tr {
+    background: rgba(20, 26, 38, 0.6) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+tbody tr:hover {
+    background: rgba(28, 37, 54, 0.8) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Round row caps for custom spacing layout */
+tbody tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-left: 1px solid rgba(255, 255, 255, 0.03); }
+tbody tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-right: 1px solid rgba(255, 255, 255, 0.03); }
+
+/* Minimalist Input Form Elements */
+input, select {
+    background: #090b11 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+    border-color: #00ff66 !important;
+    box-shadow: 0 0 14px rgba(0, 255, 102, 0.15) !important;
+    outline: none !important;
+}
+
+/* High-End Tech Pill Badges */
 .tier-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 52px;
+    width: 56px;
     height: 22px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     border-radius: 4px;
-    letter-spacing: 0.05em;
-    background-color: #111827;
-    border: 1px solid #1f2937;
+    background: #090b11;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tier-empty {
-    color: #4b5563;
-    font-weight: 500;
+    color: #334155;
+    font-weight: 400;
 }
 
-/* Hyper-Clean Neon Tiers */
-.badge-ht1 { color: #ff3344; border-color: rgba(255, 51, 68, 0.4); background: rgba(255, 51, 68, 0.05); }
-.badge-lt1 { color: #ff5566; border-color: rgba(255, 85, 102, 0.2); background: rgba(255, 85, 102, 0.02); }
-.badge-ht2 { color: #ff7700; border-color: rgba(255, 119, 0, 0.4); background: rgba(255, 119, 0, 0.05); }
-.badge-lt2 { color: #ff9933; border-color: rgba(255, 153, 51, 0.2); background: rgba(255, 153, 51, 0.02); }
-.badge-ht3 { color: #ffcc00; border-color: rgba(255, 204, 0, 0.4); background: rgba(255, 204, 0, 0.05); }
-.badge-lt3 { color: #ffdd44; border-color: rgba(255, 221, 68, 0.2); background: rgba(255, 221, 68, 0.02); }
-.badge-ht4 { color: #00ff66; border-color: rgba(0, 255, 102, 0.4); background: rgba(0, 255, 102, 0.05); }
-.badge-lt4 { color: #33ff88; border-color: rgba(51, 255, 136, 0.2); background: rgba(51, 255, 136, 0.02); }
-.badge-ht5 { color: #0099ff; border-color: rgba(0, 153, 255, 0.4); background: rgba(0, 153, 255, 0.05); }
-.badge-lt5 { color: #33b1ff; border-color: rgba(51, 177, 255, 0.2); background: rgba(51, 177, 255, 0.02); }
+/* Clean Neon Color Grading */
+.badge-ht1 { color: #ff3b30; border-color: rgba(255, 59, 48, 0.3); background: rgba(255, 59, 48, 0.06); }
+.badge-lt1 { color: #ff453a; border-color: rgba(255, 69, 58, 0.15); background: rgba(255, 69, 58, 0.02); }
+.badge-ht2 { color: #ff9f0a; border-color: rgba(255, 159, 10, 0.3); background: rgba(255, 159, 10, 0.06); }
+.badge-lt2 { color: #ffb340; border-color: rgba(255, 179, 64, 0.15); background: rgba(255, 179, 64, 0.02); }
+.badge-ht3 { color: #ffd60a; border-color: rgba(255, 214, 10, 0.3); background: rgba(255, 214, 10, 0.06); }
+.badge-lt3 { color: #ffe040; border-color: rgba(255, 224, 64, 0.15); background: rgba(255, 224, 64, 0.02); }
+.badge-ht4 { color: #30d158; border-color: rgba(48, 209, 88, 0.4); background: rgba(48, 209, 88, 0.08); text-shadow: 0 0 8px rgba(48, 209, 88, 0.2); }
+.badge-lt4 { color: #34c759; border-color: rgba(52, 199, 89, 0.15); background: rgba(52, 199, 89, 0.02); }
+.badge-ht5 { color: #0a84ff; border-color: rgba(10, 132, 255, 0.3); background: rgba(10, 132, 255, 0.06); }
+.badge-lt5 { color: #409fff; border-color: rgba(64, 159, 255, 0.15); background: rgba(64, 159, 255, 0.02); }
 
-/* Podiums (Soft glowing row indicators) */
-.top-1 { border-left: 3px solid #00ff66 !important; background: linear-gradient(90deg, rgba(0, 255, 102, 0.03) 0%, transparent 100%); }
-.top-2 { border-left: 3px solid rgba(0, 255, 102, 0.5) !important; background: linear-gradient(90deg, rgba(0, 255, 102, 0.01) 0%, transparent 100%); }
-.top-3 { border-left: 3px solid rgba(0, 255, 102, 0.2) !important; }
-
-/* Modern Dashboard Input Fields */
-input, select {
-    background-color: #0b0f19 !important;
-    border: 1px solid #1f2937 !important;
-    color: #ffffff !important;
-    border-radius: 6px !important;
-    transition: all 0.15s ease-in-out;
-}
-input:focus, select:focus {
-    border-color: #00ff66 !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(0, 255, 102, 0.15) !important;
+/* Accent Buttons */
+#sync-btn, .bg-amber-500, button[type="submit"] {
+    background: #00ff66 !important;
+    color: #05070a !important;
+    font-weight: 700 !important;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -0.02em;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(0, 255, 102, 0.3);
+    transition: all 0.2s ease;
 }
 
-/* Glass panel enhancements for dashboard boxes */
-.crypto-card {
-    background: rgba(11, 15, 25, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(31, 41, 55, 0.7);
+#sync-btn:hover, button[type="submit"]:hover {
+    box-shadow: 0 6px 20px rgba(0, 255, 102, 0.5);
+    transform: translateY(-1px);
 }
 
-/* Minimalistic sharp header lines */
-th {
-    font-family: 'Fira Code', monospace;
-    color: #9ca3af !important;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 2px solid #1f2937 !important;
-}
-
-tr {
-    border-bottom: 1px solid #111827 !important;
-}
+/* Thin Custom Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #0b0d13; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #00ff66; }
