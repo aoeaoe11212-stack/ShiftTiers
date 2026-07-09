@@ -5,7 +5,7 @@ let localPlayerData = [];
 let databaseFileSHA = ""; // Tracked by GitHub API for editing files safely
 
 document.addEventListener("DOMContentLoaded", () => {
-    // FIX: Generate form dropdown selector choices *after* DOM content loads fully
+    // Generate form dropdown selector choices *after* DOM content loads fully
     gameModes.forEach(mode => {
         const selectEl = document.getElementById(`tier-${mode}`);
         if (selectEl) {
@@ -122,7 +122,7 @@ function pushUpdatesToGitHub() {
     const bodyPayload = {
         message: "Automated database sync via ShiftPvP Dashboard Panel Engine",
         content: base64Payload,
-        sha: databaseFileSHA // Tells GitHub we are overwriting the correct file version string identifier
+        sha: databaseFileSHA 
     };
 
     fetch(putURL, {
@@ -141,9 +141,14 @@ function pushUpdatesToGitHub() {
     .then(result => {
         alert("Success! Live database has been updated completely inside your repo.");
         databaseFileSHA = result.content.sha; // Save fresh tracking validation signature
+        
+        // FIX: Re-render the existing local data table immediately so players don't vanish!
+        renderAdminTable(); 
     })
     .catch(err => {
         alert("Global push pipeline synchronization trace failure error: " + err.message);
+        // Fallback safety to ensure UI displays data if request faults out
+        renderAdminTable();
     })
     .finally(() => {
         syncBtn.disabled = false;
