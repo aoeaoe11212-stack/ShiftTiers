@@ -1,129 +1,245 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShiftPvP Admin Live Panel</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body class="bg-[#0b0e14] text-gray-200 font-sans antialiased min-h-screen">
+// 1. Core Variables & Tier Configurations Array
+const availableTiers = ["-", "HT1", "LT1", "HT2", "LT2", "HT3", "LT3", "HT4", "LT4", "HT5", "LT5"];
+const gameModes = ["nethpot", "crystal", "uhc", "smp", "sword", "dsmp"];
+let localPlayerData = [];
+let databaseFileSHA = ""; // Tracked by GitHub API for editing files safely
 
-    <nav class="bg-[#111520] border-b border-gray-800/60 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <span class="text-2xl font-black tracking-wider text-amber-400">SHIFT<span class="text-white">PVP</span></span>
-                <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-bold">LIVE DATABASE LINK</span>
-            </div>
-            <a href="index.html" class="bg-gray-800 hover:bg-gray-700 text-xs font-bold px-4 py-2 rounded transition">View Public Leaderboard</a>
-        </div>
-    </nav>
+document.addEventListener("DOMContentLoaded", () => {
+    // FIX: Generate form dropdown selector choices *after* DOM content loads fully
+    gameModes.forEach(mode => {
+        const selectEl = document.getElementById(`tier-${mode}`);
+        if (selectEl) {
+            selectEl.innerHTML = ''; // Clean old placeholder elements if any
+            availableTiers.forEach(tier => {
+                const opt = document.createElement('option');
+                opt.value = tier;
+                opt.textContent = tier;
+                selectEl.appendChild(opt);
+            });
+        }
+    });
 
-    <main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+    // Populate configuration inputs if data is saved in local browser cache tables
+    loadCachedConfigurations();
 
-        <div class="bg-[#111520] border border-gray-800 p-5 rounded-xl shadow-xl">
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-wider mb-3">1. GitHub Integration Setup (Required Once)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">GitHub Username</label>
-                    <input type="text" id="cfg-username" placeholder="e.g., yourname" class="w-full bg-[#161b26] border border-gray-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-white">
+    // Pull current production profiles dataset records
+    fetchExistingDatabase();
+
+    // Event Listeners for form actions
+    document.getElementById('player-form').addEventListener('submit', handleFormSubmit);
+    document.getElementById('cancel-btn').addEventListener('click', resetAdminForm);
+});
+
+/* ==========================================================================
+   AUTHENTICATION ENGINE LOOPS & SECURE CONFIGURATIONS STORAGE LAYER
+   ========================================================================== */
+function saveConfiguration() {
+    const username = document.getElementById('cfg-username').value.trim();
+    const repo = document.getElementById('cfg-repo').value.trim();
+    const token = document.getElementById('cfg-token').value.trim();
+
+    if (!username || !repo || !token) {
+        alert("Please fulfill all integration authorization inputs to link your workspace records.");
+        return;
+    }
+
+    localStorage.setItem('shift_gh_user', username);
+    localStorage.setItem('shift_gh_repo', repo);
+    localStorage.setItem('shift_gh_token', token);
+
+    alert("Local GitHub connection configuration profile successfully compiled. Fetching active file data signatures...");
+    fetchExistingDatabase();
+}
+
+function loadCachedConfigurations() {
+    if (localStorage.getItem('shift_gh_user')) document.getElementById('cfg-username').value = localStorage.getItem('shift_gh_user');
+    if (localStorage.getItem('shift_gh_repo')) document.getElementById('cfg-repo').value = localStorage.getItem('shift_gh_repo');
+    if (localStorage.getItem('shift_gh_token')) document.getElementById('cfg-token').value = localStorage.getItem('shift_gh_token');
+}
+
+/* ==========================================================================
+   CORE READ/WRITE PIPELINE REST CONNECTIONS (AUTO SYNC)
+   ========================================================================== */
+function fetchExistingDatabase() {
+    const user = localStorage.getItem('shift_gh_user');
+    const repo = localStorage.getItem('shift_gh_repo');
+    const token = localStorage.getItem('shift_gh_token');
+
+    let fetchURL = 'data/players.json';
+
+    // Upgrade target stream route parameters if valid token values match cache tables
+    if (user && repo && token) {
+        fetchURL = `https://api.github.com/repos/${user}/${repo}/contents/data/players.json`;
+    }
+
+    const headers = token ? { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } : {};
+
+    fetch(fetchURL, { headers })
+        .then(res => {
+            if (!res.ok) throw new Error("Base file path validation mismatch state.");
+            return res.json();
+        })
+        .then(data => {
+            if (data.content && data.sha) {
+                // Read and unpack Base64 encoded payload array blocks delivered by raw GitHub webhooks
+                databaseFileSHA = data.sha;
+                localPlayerData = JSON.parse(atob(data.content.replace(/\s/g, '')));
+            } else {
+                localPlayerData = data;
+            }
+            renderAdminTable();
+        })
+        .catch(err => {
+            console.warn("API direct pipeline routing inactive, fallback to local root asset loading tracking configurations:", err);
+            // Standby static fallback trigger execution block loops
+            fetch('data/players.json')
+                .then(r => r.json())
+                .then(d => { localPlayerData = d; renderAdminTable(); })
+                .catch(() => { localPlayerData = []; renderAdminTable(); });
+        });
+}
+
+function pushUpdatesToGitHub() {
+    const user = localStorage.getItem('shift_gh_user');
+    const repo = localStorage.getItem('shift_gh_repo');
+    const token = localStorage.getItem('shift_gh_token');
+
+    if (!user || !repo || !token) {
+        alert("Error: Authentication parameters missing. Please link your credentials configuration parameters at step 1 first.");
+        return;
+    }
+
+    const syncBtn = document.getElementById('sync-btn');
+    syncBtn.disabled = true;
+    syncBtn.textContent = "Pushing data...";
+
+    const putURL = `https://api.github.com/repos/${user}/${repo}/contents/data/players.json`;
+    const updatedJSONContentString = JSON.stringify(localPlayerData, null, 2);
+    
+    // Safely encode to UTF-8 Base64 payload string configurations
+    const base64Payload = btoa(unescape(encodeURIComponent(updatedJSONContentString)));
+
+    const bodyPayload = {
+        message: "Automated database sync via ShiftPvP Dashboard Panel Engine",
+        content: base64Payload,
+        sha: databaseFileSHA // Tells GitHub we are overwriting the correct file version string identifier
+    };
+
+    fetch(putURL, {
+        method: "PUT",
+        headers: {
+            "Authorization": `token ${token}`,
+            "Accept": "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(bodyPayload)
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Synchronization request denied by GitHub endpoint layers.");
+        return res.json();
+    })
+    .then(result => {
+        alert("Success! Live database has been updated completely inside your repo.");
+        databaseFileSHA = result.content.sha; // Save fresh tracking validation signature
+    })
+    .catch(err => {
+        alert("Global push pipeline synchronization trace failure error: " + err.message);
+    })
+    .finally(() => {
+        syncBtn.disabled = false;
+        syncBtn.textContent = "Update Live Site";
+    });
+}
+
+/* ==========================================================================
+   UI DATA FORM CRUD INTERACTION METHODS
+   ========================================================================== */
+function renderAdminTable() {
+    const tbody = document.getElementById('admin-table-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    localPlayerData.forEach((player, index) => {
+        let cellsHTML = '';
+        gameModes.forEach(mode => {
+            const val = player.tiers[mode] || "-";
+            const textClass = val === "-" ? "text-gray-600 font-normal" : "text-amber-400 font-extrabold";
+            cellsHTML += `<td class="py-3 px-2 text-center text-xs ${textClass}">${val}</td>`;
+        });
+
+        const row = document.createElement('tr');
+        row.className = "hover:bg-[#161b26]/30 transition duration-100";
+        row.innerHTML = `
+            <td class="py-3 px-5 font-bold text-sm text-gray-300">
+                <div class="flex items-center gap-2">
+                    <img src="https://mc-heads.net/avatar/${player.username}/18" alt="Skin" class="w-4 h-4 rounded-sm bg-gray-800 shrink-0">
+                    <span>${player.username}</span>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Repository Name</label>
-                    <input type="text" id="cfg-repo" placeholder="e.g., minecraft-pvp-tiers" class="w-full bg-[#161b26] border border-gray-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-white">
+            </td>
+            ${cellsHTML}
+            <td class="py-3 px-5 text-right">
+                <div class="flex justify-end gap-2">
+                    <button onclick="startEdit(${index})" class="text-xs bg-gray-800 text-amber-400 hover:bg-gray-700 px-2 py-1 rounded font-bold transition cursor-pointer">Edit</button>
+                    <button onclick="deletePlayer(${index})" class="text-xs bg-red-950/40 text-red-400 hover:bg-red-900/40 border border-red-900/30 px-2 py-1 rounded font-bold transition cursor-pointer">Delete</button>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Personal Access Token (Classic)</label>
-                    <input type="password" id="cfg-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx" class="w-full bg-[#161b26] border border-gray-800 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-white">
-                </div>
-            </div>
-            <div class="mt-3 flex justify-end">
-                <button onclick="saveConfiguration()" class="bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs px-4 py-2 rounded transition shadow cursor-pointer">Connect GitHub Repository</button>
-            </div>
-        </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            
-            <div class="lg:col-span-1 bg-[#111520] border border-gray-800 p-6 rounded-xl shadow-xl">
-                <h2 id="form-title" class="text-base font-black text-amber-400 uppercase tracking-wider mb-4">Add New Player</h2>
-                
-                <form id="player-form" class="space-y-4">
-                    <input type="hidden" id="edit-index" value="-1">
-                    
-                    <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Minecraft Username</label>
-                        <input type="text" id="username" required placeholder="e.g., Dream" class="w-full bg-[#161b26] border border-gray-800 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 text-white placeholder-gray-600">
-                    </div>
+function handleFormSubmit(e) {
+    e.preventDefault();
+    const editIdx = parseInt(document.getElementById('edit-index').value);
+    const usernameInput = document.getElementById('username').value.trim();
 
-                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-gray-800/60">
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Nethpot</label>
-                            <select id="tier-nethpot" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Crystal</label>
-                            <select id="tier-crystal" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">UHC</label>
-                            <select id="tier-uhc" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">SMP</label>
-                            <select id="tier-smp" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Sword</label>
-                            <select id="tier-sword" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">DSMP</label>
-                            <select id="tier-dsmp" class="w-full bg-[#161b26] border border-gray-800 rounded-md p-1.5 text-xs text-white focus:outline-none focus:border-amber-500"></select>
-                        </div>
-                    </div>
+    if (!usernameInput) return;
 
-                    <div class="flex gap-2 pt-2">
-                        <button type="submit" id="submit-btn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs py-2.5 rounded-lg transition shadow-md cursor-pointer">Save Local Changes</button>
-                        <button type="button" id="cancel-btn" class="hidden bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold text-xs py-2.5 rounded-lg transition px-3 cursor-pointer">Cancel</button>
-                    </div>
-                </form>
-            </div>
+    const newTiers = {};
+    gameModes.forEach(mode => {
+        newTiers[mode] = document.getElementById(`tier-${mode}`).value;
+    });
 
-            <div class="lg:col-span-2 space-y-4">
-                
-                <div class="bg-[#141d2e] border border-blue-500/30 p-4 rounded-xl flex items-center justify-between shadow-lg">
-                    <div>
-                        <h3 class="text-sm font-bold text-blue-400">Deploy Global Database</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">Clicking this completely synchronizes your local revisions back into GitHub storage dynamically.</p>
-                    </div>
-                    <button onclick="pushUpdatesToGitHub()" id="sync-btn" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-black px-6 py-3 rounded-lg transition shadow-xl tracking-wider uppercase cursor-pointer">
-                        Update Live Site
-                    </button>
-                </div>
+    const targetPlayerDataObj = { username: usernameInput, tiers: newTiers };
 
-                <div class="bg-[#111520] border border-gray-800 rounded-xl overflow-hidden shadow-xl">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-[#0e111a] text-gray-500 text-[10px] font-bold uppercase tracking-wider border-b border-gray-800/50">
-                                <th class="py-3 px-5">Player</th>
-                                <th class="py-3 px-2 text-center">Neth</th>
-                                <th class="py-3 px-2 text-center">Crys</th>
-                                <th class="py-3 px-2 text-center">UHC</th>
-                                <th class="py-3 px-2 text-center">SMP</th>
-                                <th class="py-3 px-2 text-center">Swrd</th>
-                                <th class="py-3 px-2 text-center">DSMP</th>
-                                <th class="py-3 px-5 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-tbody" class="divide-y divide-gray-850/40">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
+    if (editIdx === -1) {
+        const exists = localPlayerData.some(p => p.username.toLowerCase() === usernameInput.toLowerCase());
+        if (exists) { alert("A player with that username already exists!"); return; }
+        localPlayerData.push(targetPlayerDataObj);
+    } else {
+        localPlayerData[editIdx] = targetPlayerDataObj;
+    }
 
-        </div>
-    </main>
+    resetAdminForm();
+    renderAdminTable();
+}
 
-    <script src="assets/js/admin.js"></script>
-</body>
-</html>
+function startEdit(index) {
+    const player = localPlayerData[index];
+    document.getElementById('form-title').textContent = `Editing: ${player.username}`;
+    document.getElementById('edit-index').value = index;
+    document.getElementById('username').value = player.username;
+
+    gameModes.forEach(mode => {
+        document.getElementById(`tier-${mode}`).value = player.tiers[mode] || "-";
+    });
+
+    document.getElementById('cancel-btn').classList.remove('hidden');
+    document.getElementById('submit-btn').textContent = "Update Local Entry Data";
+}
+
+function deletePlayer(index) {
+    if (confirm(`Remove '${localPlayerData[index].username}' from workspace configurations data tree?`)) {
+        localPlayerData.splice(index, 1);
+        renderAdminTable();
+        resetAdminForm();
+    }
+}
+
+function resetAdminForm() {
+    document.getElementById('form-title').textContent = "Add New Player";
+    document.getElementById('edit-index').value = "-1";
+    document.getElementById('player-form').reset();
+    document.getElementById('cancel-btn').classList.add('hidden');
+    document.getElementById('submit-btn').textContent = "Save Local Changes";
+}
