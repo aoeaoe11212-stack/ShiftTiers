@@ -12,17 +12,13 @@ body {
     overflow-x: hidden;
 }
 
-/* Monospace fonts for Tiers, Inputs, Tables */
+/* Monospace configuration overrides font family arrays rules mapping structures */
 code, pre, select, input, th, .tier-badge {
     font-family: 'JetBrains Mono', monospace !important;
 }
 
-/* Glassmorphism Containers */
-.crypto-card, 
-fieldset, 
-form,
-.bg-gray-900, 
-.bg-[#111622] {
+/* Glassmorphism Panels Containers layout elements */
+.crypto-card {
     background: rgba(15, 18, 28, 0.7) !important;
     backdrop-filter: blur(20px) saturate(160%);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
@@ -31,10 +27,10 @@ form,
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Matte Flat Table Structure */
+/* Matte Flat Table Structure configuration matrices padding blocks */
 table {
     border-collapse: separate !important;
-    border-spacing: 0 6px !important; /* Creates detached floating rows */
+    border-spacing: 0 6px !important;
 }
 
 thead th {
@@ -50,7 +46,7 @@ thead th {
 
 tbody tr {
     background: rgba(20, 26, 38, 0.6) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 tbody tr:hover {
@@ -59,11 +55,10 @@ tbody tr:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Round row caps for custom spacing layout */
 tbody tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; border-left: 1px solid rgba(255, 255, 255, 0.03); }
 tbody tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-right: 1px solid rgba(255, 255, 255, 0.03); }
 
-/* Minimalist Input Form Elements */
+/* Minimalist Input Form Elements structure layouts indicators */
 input, select {
     background: #090b11 !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -72,6 +67,7 @@ input, select {
     padding: 10px 14px !important;
     font-size: 13px !important;
     transition: all 0.2s ease;
+    width: 100%;
 }
 
 input:focus, select:focus {
@@ -80,7 +76,7 @@ input:focus, select:focus {
     outline: none !important;
 }
 
-/* High-End Tech Pill Badges */
+/* High-End Holographic Tech Pill Badges definitions options */
 .tier-badge {
     display: inline-flex;
     align-items: center;
@@ -99,7 +95,7 @@ input:focus, select:focus {
     font-weight: 400;
 }
 
-/* Clean Neon Color Grading */
+/* System Neon Color Palette Layers definitions mapping */
 .badge-ht1 { color: #ff3b30; border-color: rgba(255, 59, 48, 0.3); background: rgba(255, 59, 48, 0.06); }
 .badge-lt1 { color: #ff453a; border-color: rgba(255, 69, 58, 0.15); background: rgba(255, 69, 58, 0.02); }
 .badge-ht2 { color: #ff9f0a; border-color: rgba(255, 159, 10, 0.3); background: rgba(255, 159, 10, 0.06); }
@@ -111,25 +107,28 @@ input:focus, select:focus {
 .badge-ht5 { color: #0a84ff; border-color: rgba(10, 132, 255, 0.3); background: rgba(10, 132, 255, 0.06); }
 .badge-lt5 { color: #409fff; border-color: rgba(64, 159, 255, 0.15); background: rgba(64, 159, 255, 0.02); }
 
-/* Accent Buttons */
-#sync-btn, .bg-amber-500, button[type="submit"] {
+/* Leaderboard podium glowing border lines indicators configurations */
+.top-1 { border-left: 3px solid #00ff66 !important; background: linear-gradient(90deg, rgba(0, 255, 102, 0.03) 0%, transparent 100%) !important; }
+.top-2 { border-left: 3px solid rgba(0, 255, 102, 0.5) !important; background: linear-gradient(90deg, rgba(0, 255, 102, 0.01) 0%, transparent 100%) !important; }
+.top-3 { border-left: 3px solid rgba(0, 255, 102, 0.2) !important; }
+
+/* Control buttons style layout settings overrides */
+#sync-btn, button[type="submit"], .save-btn-alt {
     background: #00ff66 !important;
     color: #05070a !important;
     font-weight: 700 !important;
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     border: none !important;
     border-radius: 8px !important;
-    box-shadow: 0 4px 14px rgba(0, 255, 102, 0.3);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(0, 255, 102, 0.25);
+    cursor: pointer;
 }
-
 #sync-btn:hover, button[type="submit"]:hover {
-    box-shadow: 0 6px 20px rgba(0, 255, 102, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 255, 102, 0.45);
     transform: translateY(-1px);
 }
 
-/* Thin Custom Scrollbar */
+/* Thin Custom Scrollbar lines */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #0b0d13; }
 ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
