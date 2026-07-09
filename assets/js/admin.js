@@ -1,15 +1,14 @@
-// 1. Core Variables & Tier Configurations Array
 const availableTiers = ["-", "HT1", "LT1", "HT2", "LT2", "HT3", "LT3", "HT4", "LT4", "HT5", "LT5"];
-const gameModes = ["nethpot", "crystal", "uhc", "smp", "sword", "dsmp"];
+const gameModes = ["nethpot", "crystal", "uhc", "smp", "sword", "dsmp", "mace"]; // Included Mace gamemode parameter references
 let localPlayerData = [];
-let databaseFileSHA = ""; // Tracked by GitHub API for editing files safely
+let databaseFileSHA = "";
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Generate form dropdown selector choices *after* DOM content loads fully
+    // Dropdowns generate *after* DOM loads completely, fixing the selection breaking bug
     gameModes.forEach(mode => {
         const selectEl = document.getElementById(`tier-${mode}`);
         if (selectEl) {
-            selectEl.innerHTML = ''; // Clean old placeholder elements if any
+            selectEl.innerHTML = ''; 
             availableTiers.forEach(tier => {
                 const opt = document.createElement('option');
                 opt.value = tier;
@@ -19,27 +18,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Populate configuration inputs if data is saved in local browser cache tables
     loadCachedConfigurations();
-
-    // Pull current production profiles dataset records
     fetchExistingDatabase();
 
-    // Event Listeners for form actions
     document.getElementById('player-form').addEventListener('submit', handleFormSubmit);
     document.getElementById('cancel-btn').addEventListener('click', resetAdminForm);
 });
 
-/* ==========================================================================
-   AUTHENTICATION ENGINE LOOPS & SECURE CONFIGURATIONS STORAGE LAYER
-   ========================================================================== */
 function saveConfiguration() {
     const username = document.getElementById('cfg-username').value.trim();
     const repo = document.getElementById('cfg-repo').value.trim();
     const token = document.getElementById('cfg-token').value.trim();
 
     if (!username || !repo || !token) {
-        alert("Please fulfill all integration authorization inputs to link your workspace records.");
+        alert("Please complete all integration fields to authenticate connection routes.");
         return;
     }
 
@@ -47,7 +39,7 @@ function saveConfiguration() {
     localStorage.setItem('shift_gh_repo', repo);
     localStorage.setItem('shift_gh_token', token);
 
-    alert("Local GitHub connection configuration profile successfully compiled. Fetching active file data signatures...");
+    alert("Connection criteria configuration saved. Restructuring live tree data indices...");
     fetchExistingDatabase();
 }
 
@@ -57,17 +49,12 @@ function loadCachedConfigurations() {
     if (localStorage.getItem('shift_gh_token')) document.getElementById('cfg-token').value = localStorage.getItem('shift_gh_token');
 }
 
-/* ==========================================================================
-   CORE READ/WRITE PIPELINE REST CONNECTIONS (AUTO SYNC)
-   ========================================================================== */
 function fetchExistingDatabase() {
     const user = localStorage.getItem('shift_gh_user');
     const repo = localStorage.getItem('shift_gh_repo');
     const token = localStorage.getItem('shift_gh_token');
 
     let fetchURL = 'data/players.json';
-
-    // Upgrade target stream route parameters if valid token values match cache tables
     if (user && repo && token) {
         fetchURL = `https://api.github.com/repos/${user}/${repo}/contents/data/players.json`;
     }
@@ -75,13 +62,9 @@ function fetchExistingDatabase() {
     const headers = token ? { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" } : {};
 
     fetch(fetchURL, { headers })
-        .then(res => {
-            if (!res.ok) throw new Error("Base file path validation mismatch state.");
-            return res.json();
-        })
+        .then(res => { if (!res.ok) throw new Error("Database validation mapping fault."); return res.json(); })
         .then(data => {
             if (data.content && data.sha) {
-                // Read and unpack Base64 encoded payload array blocks delivered by raw GitHub webhooks
                 databaseFileSHA = data.sha;
                 localPlayerData = JSON.parse(atob(data.content.replace(/\s/g, '')));
             } else {
@@ -89,9 +72,7 @@ function fetchExistingDatabase() {
             }
             renderAdminTable();
         })
-        .catch(err => {
-            console.warn("API direct pipeline routing inactive, fallback to local root asset loading tracking configurations:", err);
-            // Standby static fallback trigger execution block loops
+        .catch(() => {
             fetch('data/players.json')
                 .then(r => r.json())
                 .then(d => { localPlayerData = d; renderAdminTable(); })
@@ -105,24 +86,22 @@ function pushUpdatesToGitHub() {
     const token = localStorage.getItem('shift_gh_token');
 
     if (!user || !repo || !token) {
-        alert("Error: Authentication parameters missing. Please link your credentials configuration parameters at step 1 first.");
+        alert("Authentication context not set. Complete step 1 fields prior to deploying parameters data.");
         return;
     }
 
     const syncBtn = document.getElementById('sync-btn');
     syncBtn.disabled = true;
-    syncBtn.textContent = "Pushing data...";
+    syncBtn.textContent = "SYNCING INTERFACES...";
 
     const putURL = `https://api.github.com/repos/${user}/${repo}/contents/data/players.json`;
-    const updatedJSONContentString = JSON.stringify(localPlayerData, null, 2);
-    
-    // Safely encode to UTF-8 Base64 payload string configurations
-    const base64Payload = btoa(unescape(encodeURIComponent(updatedJSONContentString)));
+    const updatedJSON = JSON.stringify(localPlayerData, null, 2);
+    const base64Payload = btoa(unescape(encodeURIComponent(updatedJSON)));
 
     const bodyPayload = {
-        message: "Automated database sync via ShiftPvP Dashboard Panel Engine",
+        message: "Automated database update via ShiftPvP Matrix Terminal Engine Control Panel",
         content: base64Payload,
-        sha: databaseFileSHA 
+        sha: databaseFileSHA
     };
 
     fetch(putURL, {
@@ -134,31 +113,16 @@ function pushUpdatesToGitHub() {
         },
         body: JSON.stringify(bodyPayload)
     })
-    .then(res => {
-        if (!res.ok) throw new Error("Synchronization request denied by GitHub endpoint layers.");
-        return res.json();
-    })
+    .then(res => { if (!res.ok) throw new Error("Transmission error targeting GitHub nodes endpoint."); return res.json(); })
     .then(result => {
-        alert("Success! Live database has been updated completely inside your repo.");
-        databaseFileSHA = result.content.sha; // Save fresh tracking validation signature
-        
-        // FIX: Re-render the existing local data table immediately so players don't vanish!
-        renderAdminTable(); 
+        alert("Sync Complete! Data securely integrated into repo storage layers.");
+        databaseFileSHA = result.content.sha;
+        renderAdminTable(); // Fix: Retain local storage variables profiles loop display lists
     })
-    .catch(err => {
-        alert("Global push pipeline synchronization trace failure error: " + err.message);
-        // Fallback safety to ensure UI displays data if request faults out
-        renderAdminTable();
-    })
-    .finally(() => {
-        syncBtn.disabled = false;
-        syncBtn.textContent = "Update Live Site";
-    });
+    .catch(err => { alert("Synchronization trace fault interruption sequence error: " + err.message); renderAdminTable(); })
+    .finally(() => { syncBtn.disabled = false; syncBtn.textContent = "Update Live Site"; });
 }
 
-/* ==========================================================================
-   UI DATA FORM CRUD INTERACTION METHODS
-   ========================================================================== */
 function renderAdminTable() {
     const tbody = document.getElementById('admin-table-tbody');
     if (!tbody) return;
@@ -168,24 +132,26 @@ function renderAdminTable() {
         let cellsHTML = '';
         gameModes.forEach(mode => {
             const val = player.tiers[mode] || "-";
-            const textClass = val === "-" ? "text-gray-600 font-normal" : "text-amber-400 font-extrabold";
-            cellsHTML += `<td class="py-3 px-2 text-center text-xs ${textClass}">${val}</td>`;
+            if (val === "-") {
+                cellsHTML += `<td class="py-3 px-1 text-center text-xs tier-empty">-</td>`;
+            } else {
+                cellsHTML += `<td class="py-3 px-1 text-center"><span class="tier-badge badge-${val.toLowerCase()}">${val}</span></td>`;
+            }
         });
 
         const row = document.createElement('tr');
-        row.className = "hover:bg-[#161b26]/30 transition duration-100";
         row.innerHTML = `
-            <td class="py-3 px-5 font-bold text-sm text-gray-300">
-                <div class="flex items-center gap-2">
-                    <img src="https://mc-heads.net/avatar/${player.username}/18" alt="Skin" class="w-4 h-4 rounded-sm bg-gray-800 shrink-0">
+            <td class="py-3 px-5 font-semibold text-sm text-gray-200">
+                <div class="flex items-center gap-2.5">
+                    <img src="https://mc-heads.net/avatar/${player.username}/22" alt="Skin" class="w-5.5 h-5.5 rounded border border-white/10 shrink-0 bg-gray-900">
                     <span>${player.username}</span>
                 </div>
             </td>
             ${cellsHTML}
             <td class="py-3 px-5 text-right">
-                <div class="flex justify-end gap-2">
-                    <button onclick="startEdit(${index})" class="text-xs bg-gray-800 text-amber-400 hover:bg-gray-700 px-2 py-1 rounded font-bold transition cursor-pointer">Edit</button>
-                    <button onclick="deletePlayer(${index})" class="text-xs bg-red-950/40 text-red-400 hover:bg-red-900/40 border border-red-900/30 px-2 py-1 rounded font-bold transition cursor-pointer">Delete</button>
+                <div class="flex justify-end gap-1.5">
+                    <button onclick="startEdit(${index})" class="text-xs bg-white/5 text-gray-300 border border-white/10 hover:border-[#00ff66] hover:text-[#00ff66] px-2.5 py-1 rounded-md font-medium transition cursor-pointer">Edit</button>
+                    <button onclick="deletePlayer(${index})" class="text-xs bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 px-2.5 py-1 rounded-md font-medium transition cursor-pointer">Delete</button>
                 </div>
             </td>
         `;
@@ -201,15 +167,12 @@ function handleFormSubmit(e) {
     if (!usernameInput) return;
 
     const newTiers = {};
-    gameModes.forEach(mode => {
-        newTiers[mode] = document.getElementById(`tier-${mode}`).value;
-    });
-
+    gameModes.forEach(mode => { newTiers[mode] = document.getElementById(`tier-${mode}`).value; });
     const targetPlayerDataObj = { username: usernameInput, tiers: newTiers };
 
     if (editIdx === -1) {
         const exists = localPlayerData.some(p => p.username.toLowerCase() === usernameInput.toLowerCase());
-        if (exists) { alert("A player with that username already exists!"); return; }
+        if (exists) { alert("A player profile mapping matching that target identifier already exists!"); return; }
         localPlayerData.push(targetPlayerDataObj);
     } else {
         localPlayerData[editIdx] = targetPlayerDataObj;
@@ -221,20 +184,16 @@ function handleFormSubmit(e) {
 
 function startEdit(index) {
     const player = localPlayerData[index];
-    document.getElementById('form-title').textContent = `Editing: ${player.username}`;
+    document.getElementById('form-title').textContent = `// Altering: ${player.username}`;
     document.getElementById('edit-index').value = index;
     document.getElementById('username').value = player.username;
-
-    gameModes.forEach(mode => {
-        document.getElementById(`tier-${mode}`).value = player.tiers[mode] || "-";
-    });
-
+    gameModes.forEach(mode => { document.getElementById(`tier-${mode}`).value = player.tiers[mode] || "-"; });
     document.getElementById('cancel-btn').classList.remove('hidden');
-    document.getElementById('submit-btn').textContent = "Update Local Entry Data";
+    document.getElementById('submit-btn').textContent = "Apply Staged Matrix Overrides";
 }
 
 function deletePlayer(index) {
-    if (confirm(`Remove '${localPlayerData[index].username}' from workspace configurations data tree?`)) {
+    if (confirm(`Purge profile entity records targeting identifier details for '${localPlayerData[index].username}'?`)) {
         localPlayerData.splice(index, 1);
         renderAdminTable();
         resetAdminForm();
@@ -242,9 +201,9 @@ function deletePlayer(index) {
 }
 
 function resetAdminForm() {
-    document.getElementById('form-title').textContent = "Add New Player";
+    document.getElementById('form-title').textContent = "// Deploy New Entry";
     document.getElementById('edit-index').value = "-1";
     document.getElementById('player-form').reset();
     document.getElementById('cancel-btn').classList.add('hidden');
-    document.getElementById('submit-btn').textContent = "Save Local Changes";
+    document.getElementById('submit-btn').textContent = "Commit Profile Data";
 }
