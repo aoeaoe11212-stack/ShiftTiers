@@ -3,59 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShiftPvP - Official Rankings & Leaderboard</title>
+    <title>ShiftPvP - Official Rankings Matrix</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-[#0b0e14] text-gray-200 font-sans antialiased min-h-screen">
+<body class="min-h-screen">
 
-    <nav class="bg-[#111520] border-b border-gray-800/60 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <nav class="border-b border-white/5 sticky top-0 z-50 bg-[#0b0d13]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <span class="text-2xl font-black tracking-wider text-amber-400">SHIFT<span class="text-white">PVP</span></span>
-                <span class="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-bold">RANKINGS</span>
+                <span class="text-2xl font-black tracking-wider text-[#00ff66]">SHIFT<span class="text-white">PVP</span></span>
+                <span class="text-[9px] font-mono border border-white/10 text-gray-400 px-2 py-0.5 rounded tracking-widest uppercase bg-white/5">Tier Matrix</span>
             </div>
             
-            <div class="w-full sm:w-80 relative">
-                <input type="text" id="search-player" placeholder="Search player..." class="w-full bg-[#161b26] border border-gray-800 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-amber-500 transition text-white placeholder-gray-500">
-                <div class="absolute right-3 top-2.5 text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
-                    </svg>
-                </div>
+            <div class="w-full md:w-80 relative">
+                <input type="text" id="search-player" placeholder="FILTER BY USERNAME..." class="w-full uppercase font-mono tracking-wider text-xs">
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-10">
-        <div class="bg-[#111520] border border-gray-800/80 rounded-xl overflow-hidden shadow-2xl">
-            
+    <main class="max-w-7xl mx-auto px-6 mt-10">
+        <div class="crypto-card overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+                <table class="w-full text-left border-collapse min-w-[850px]">
                     <thead>
-                        <tr class="bg-[#141926] text-gray-400 text-[11px] font-black uppercase tracking-wider border-b border-gray-800">
-                            <th class="py-4 px-4 text-center w-16">Rank</th>
-                            <th class="py-4 px-6 min-w-[200px]">Player Username</th>
-                            <th class="py-4 px-4 text-center">Nethpot</th>
-                            <th class="py-4 px-4 text-center">Crystal</th>
-                            <th class="py-3 px-2 text-center">Mace</th>
-                            <th class="py-4 px-4 text-center">UHC</th>
-                            <th class="py-4 px-4 text-center">SMP</th>
-                            <th class="py-4 px-4 text-center">Sword</th>
-                            <th class="py-4 px-4 text-center">DSMP</th>
-                            <th class="py-4 px-6 text-right w-28">Global Pts</th>
+                        <tr>
+                            <th class="py-4 px-5 text-center w-16">Rank</th>
+                            <th class="py-4 px-5">Username</th>
+                            <th class="py-4 px-2 text-center">Nethpot</th>
+                            <th class="py-4 px-2 text-center">Crystal</th>
+                            <th class="py-4 px-2 text-center">UHC</th>
+                            <th class="py-4 px-2 text-center">SMP</th>
+                            <th class="py-4 px-2 text-center">Sword</th>
+                            <th class="py-4 px-2 text-center">DSMP</th>
+                            <th class="py-4 px-2 text-center">Mace</th> <th class="py-4 px-6 text-right w-28">Global Pts</th>
+                            <th></th>
                         </tr>
                     </thead>
-                    <tbody id="rankings-tbody" class="divide-y divide-gray-850/40">
+                    <tbody id="rankings-tbody">
                         </tbody>
                 </table>
             </div>
-
         </div>
     </main>
 
-    <footer class="text-center py-8 text-gray-600 border-t border-gray-900 bg-[#0b0e14] mt-20">
-        <p class="text-xs">&copy; 2026 ShiftPvP Leaderboard Matrix. All rights reserved.</p>
+    <footer class="text-center py-12 text-gray-600 text-xs font-mono tracking-wide">
+        <p>&copy; 2026 SHIFTPVP PROTOCOL INTERFACE. ALL RIGHTS REGULATED.</p>
     </footer>
 
     <script src="assets/js/app.js"></script>
