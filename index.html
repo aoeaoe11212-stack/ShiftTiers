@@ -3,53 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft PvP Tier List</title>
+    <title>Minecraft PvP Tier List & Leaderboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-gray-950 text-white font-sans antialiased min-h-screen">
+<body class="bg-[#0b0e14] text-gray-200 font-sans antialiased min-h-screen">
 
-    <nav class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center border-b border-gray-900">
-        <a href="index.html" class="text-xl font-black tracking-wider text-amber-400">PVP TIERS</a>
-        <div class="flex gap-4">
-            <a href="index.html" class="text-amber-400 font-bold border-b-2 border-amber-400 pb-1">Tier List</a>
-            <a href="leaderboard.html" class="text-gray-400 hover:text-white transition">Leaderboard</a>
-        </div>
-    </nav>
-
-    <header class="py-10 text-center">
-        <h1 class="text-4xl md:text-5xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r fancy-text from-amber-400 to-orange-500">MINECRAFT PVP TIERS</h1>
-        <p class="text-gray-400 mt-2 text-sm">Peringkat Player Berdasarkan Game Mode Terupdate</p>
-        
-        <div class="flex flex-wrap justify-center gap-2 mt-8 max-w-2xl mx-auto px-4" id="gamemode-selectors">
-            <button onclick="switchGameMode('nethpot')" id="btn-nethpot" class="gm-btn px-4 py-2 bg-amber-500 text-black font-bold rounded shadow transition cursor-pointer">Nethpot</button>
-            <button onclick="switchGameMode('crystal')" id="btn-crystal" class="gm-btn px-4 py-2 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold rounded shadow transition cursor-pointer">Crystal</button>
-            <button onclick="switchGameMode('uhc')" id="btn-uhc" class="gm-btn px-4 py-2 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold rounded shadow transition cursor-pointer">UHC</button>
-            <button onclick="switchGameMode('smp')" id="btn-smp" class="gm-btn px-4 py-2 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold rounded shadow transition cursor-pointer">SMP</button>
-            <button onclick="switchGameMode('sword')" id="btn-sword" class="gm-btn px-4 py-2 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold rounded shadow transition cursor-pointer">Sword</button>
-            <button onclick="switchGameMode('dsmp')" id="btn-dsmp" class="gm-btn px-4 py-2 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold rounded shadow transition cursor-pointer">DSMP</button>
-        </div>
-    </header>
-
-    <main class="max-w-5xl mx-auto px-4 pb-20">
-        
-        <div class="mb-8 max-w-md mx-auto">
-            <div class="relative">
-                <input type="text" id="search-player" placeholder="Cari nama player..." class="w-full bg-gray-900 border border-gray-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-amber-500 transition text-white">
-                <div class="absolute right-3 top-3 text-gray-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+    <nav class="bg-[#111520] border-b border-gray-800/60 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl font-black tracking-wider text-amber-400">MC<span class="text-white">TIERS</span></span>
+                <span class="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-bold">PVP</span>
+            </div>
+            
+            <div class="w-full sm:w-80 relative">
+                <input type="text" id="search-player" placeholder="Search player username..." class="w-full bg-[#161b26] border border-gray-800 rounded-lg pl-4 pr-10 py-2 text-sm focus:outline-none focus:border-amber-500 transition text-white placeholder-gray-500">
+                <div class="absolute right-3 top-2.5 text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
                     </svg>
                 </div>
             </div>
         </div>
+    </nav>
 
-        <div class="space-y-3 shadow-2xl rounded-xl p-2 bg-gray-900/30 border border-gray-900" id="tier-list-container">
+    <div class="bg-[#111520]/50 border-b border-gray-900 py-3 overflow-x-auto">
+        <div class="max-w-7xl mx-auto px-4 flex justify-start md:justify-center gap-2 min-w-max" id="gamemode-selectors">
+            <button onclick="switchGameMode('nethpot')" id="btn-nethpot" class="gm-btn px-4 py-1.5 bg-amber-500 text-black font-bold text-sm rounded shadow transition cursor-pointer">Nethpot</button>
+            <button onclick="switchGameMode('crystal')" id="btn-crystal" class="gm-btn px-4 py-1.5 bg-[#161b26] border border-gray-800 hover:bg-gray-800 font-bold text-sm rounded shadow transition cursor-pointer text-gray-400">Crystal</button>
+            <button onclick="switchGameMode('uhc')" id="btn-uhc" class="gm-btn px-4 py-1.5 bg-[#161b26] border border-gray-800 hover:bg-gray-800 font-bold text-sm rounded shadow transition cursor-pointer text-gray-400">UHC</button>
+            <button onclick="switchGameMode('smp')" id="btn-smp" class="gm-btn px-4 py-1.5 bg-[#161b26] border border-gray-800 hover:bg-gray-800 font-bold text-sm rounded shadow transition cursor-pointer text-gray-400">SMP</button>
+            <button onclick="switchGameMode('sword')" id="btn-sword" class="gm-btn px-4 py-1.5 bg-[#161b26] border border-gray-800 hover:bg-gray-800 font-bold text-sm rounded shadow transition cursor-pointer text-gray-400">Sword</button>
+            <button onclick="switchGameMode('dsmp')" id="btn-dsmp" class="gm-btn px-4 py-1.5 bg-[#161b26] border border-gray-800 hover:bg-gray-800 font-bold text-sm rounded shadow transition cursor-pointer text-gray-400">DSMP</button>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <div class="lg:col-span-2 space-y-2.5" id="tier-list-container">
+                </div>
+
+            <div class="bg-[#111520] border border-gray-800/80 rounded-xl overflow-hidden shadow-xl sticky top-24">
+                <div class="px-5 py-4 border-b border-gray-800 bg-[#141926]">
+                    <h2 class="text-sm font-black tracking-wider uppercase text-amber-400">Global Leaderboard</h2>
+                    <p class="text-xs text-gray-500 mt-0.5">Overall ranking score calculated across all 6 formats</p>
+                </div>
+                <div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#0e111a] text-gray-500 text-[10px] font-bold uppercase tracking-wider border-b border-gray-800/50">
+                                <th class="py-3 px-4 text-center w-14">#</th>
+                                <th class="py-3 px-4">Player</th>
+                                <th class="py-3 px-4 text-right w-24">Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-tbody" class="divide-y divide-gray-850/40">
+                            </tbody>
+                    </table>
+                </div>
             </div>
 
+        </div>
     </main>
 
-    <footer class="text-center py-8 text-gray-700 border-t border-gray-900">
-        <p>&copy; 2026 PvP Tier List. Powered by GitHub Pages.</p>
+    <footer class="text-center py-8 text-gray-600 border-t border-gray-900 bg-[#0b0e14] mt-20">
+        <p class="text-xs">&copy; 2026 MCTiers Clone. Powered by GitHub Pages.</p>
     </footer>
 
     <script src="assets/js/app.js"></script>
